@@ -25,6 +25,7 @@ com\certificate\system\config\DatabaseSeeder.class
 com\certificate\system\exception\DuplicateRequestException.class
 com\certificate\system\entity\User.class
 com\certificate\system\repository\RoleRepository.class
+com\certificate\system\controller\WebhookController.class
 com\certificate\system\config\SecurityConfig.class
 com\certificate\system\repository\CertificateRepository.class
 com\certificate\system\exception\InvalidRequestOperationException.class

@@ -46,6 +46,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/github-webhook/**", "/github-webhook"))
             .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints (contract: /, /login, /register, /verify/{uuid})
@@ -57,7 +58,8 @@ public class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/images/**",
-                    "/actuator/health"
+                    "/actuator/health",
+                    "/github-webhook", "/github-webhook/**"
                 ).permitAll()
                 // Admin-only endpoints
                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
