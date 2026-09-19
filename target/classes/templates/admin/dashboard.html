@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: layout('Admin Dashboard', ~{::content})}">
+<body>
+<div th:fragment="content">
+    <h4 class="mb-4">Admin Dashboard</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card total p-3">
+                <div class="text-muted small">Total System Requests</div>
+                <div class="h3 fw-bold" th:text="${dashboard.totalRequests}">0</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card pending p-3 border-warning">
+                <div class="text-muted small">Pending / Under Review</div>
+                <div class="h3 fw-bold" th:text="${dashboard.pendingRequests + dashboard.underReviewRequests}">0</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card approved p-3 border-success">
+                <div class="text-muted small">Approved</div>
+                <div class="h3 fw-bold" th:text="${dashboard.approvedRequests}">0</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-3">
+        <div class="col-md-6">
+            <a th:href="@{/admin/requests(status='PENDING')}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3 bg-light">
+                <i class="bi bi-clock-history fs-2 text-warning"></i>
+                <div>
+                    <div class="fw-semibold text-dark">Action Required</div>
+                    <div class="text-muted small" th:text="${dashboard.pendingRequests} + ' requests waiting for review'"></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a th:href="@{/admin/requests}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3 bg-light">
+                <i class="bi bi-search fs-2 text-primary"></i>
+                <div>
+                    <div class="fw-semibold text-dark">Search Requests</div>
+                    <div class="text-muted small">Find specific applicant requests</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

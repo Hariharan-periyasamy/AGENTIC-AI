@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{user/layout :: layout('My Certificates', ~{::content})}">
+<body>
+<div th:fragment="content">
+    <h4 class="mb-4">My Certificates</h4>
+
+    <div th:if="${#lists.isEmpty(certificates)}" class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        No certificates issued yet. Once your request is approved, your certificate will appear here.
+    </div>
+
+    <div class="row g-3" th:if="${!#lists.isEmpty(certificates)}">
+        <div class="col-md-4" th:each="cert : ${certificates}">
+            <div class="card p-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-award-fill fs-3 text-success"></i>
+                    <div>
+                        <div class="fw-semibold" th:text="${cert.certificateTypeName}">Type</div>
+                        <div class="text-muted small" th:text="${#temporals.format(cert.updatedAt,'dd MMM yyyy')}"></div>
+                    </div>
+                </div>
+                <code class="small text-muted" th:text="${cert.certificateUuid}"></code>
+                <div class="mt-3">
+                    <a th:href="@{/verify/{uuid}(uuid=${cert.certificateUuid})}"
+                       class="btn btn-success btn-sm w-100">
+                        <i class="bi bi-eye me-1"></i>View &amp; Download
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

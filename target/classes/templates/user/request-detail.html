@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{user/layout :: layout('Request Details', ~{::content})}">
+<body>
+<div th:fragment="content">
+    <div class="d-flex align-items-center mb-4 gap-2">
+        <a th:href="@{/user/requests}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <h4 class="mb-0">Request #<span th:text="${certRequest.id}"></span></h4>
+    </div>
+
+    <div class="card p-4" style="max-width:800px;">
+        <div class="row">
+            <div class="col-md-8">
+                <h5 class="border-bottom pb-2 mb-3">Request Information</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Certificate Type</dt>
+                    <dd class="col-sm-8" th:text="${certRequest.certificateTypeName}"></dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge rounded-pill"
+                              th:classappend="'badge-' + ${certRequest.status}"
+                              th:text="${certRequest.status}">PENDING</span>
+                    </dd>
+
+                    <dt class="col-sm-4">Submitted</dt>
+                    <dd class="col-sm-8" th:text="${#temporals.format(certRequest.createdAt,'dd MMM yyyy HH:mm')}"></dd>
+
+                    <dt class="col-sm-4">Last Updated</dt>
+                    <dd class="col-sm-8" th:text="${#temporals.format(certRequest.updatedAt,'dd MMM yyyy HH:mm')}"></dd>
+
+                    <dt class="col-sm-4 mt-3">Purpose</dt>
+                    <dd class="col-sm-8 mt-3" th:text="${certRequest.purpose}"></dd>
+
+                    <dt class="col-sm-4" th:if="${not #strings.isEmpty(certRequest.remarks)}">Remarks</dt>
+                    <dd class="col-sm-8" th:if="${not #strings.isEmpty(certRequest.remarks)}" th:text="${certRequest.remarks}"></dd>
+
+                    <th:block th:if="${certRequest.status.name() == 'REJECTED'}">
+                        <dt class="col-sm-4 text-danger mt-3">Rejection Reason</dt>
+                        <dd class="col-sm-8 text-danger mt-3 fw-semibold" th:text="${certRequest.rejectionReason}"></dd>
+                    </th:block>
+                </dl>
+            </div>
+            
+            <div class="col-md-4 border-start">
+                <h6 class="text-muted mb-3">Actions &amp; Documents</h6>
+                
+                <div class="mb-4">
+                    <div class="small fw-semibold mb-1">Attached Document</div>
+                    <div class="text-break small text-muted">
+                        <i class="bi bi-file-earmark-check text-primary me-1"></i>
+                        <span th:text="${certRequest.supportingDocumentPath}"></span>
+                    </div>
+                </div>
+
+                <!-- Only show cancel if PENDING -->
+                <div th:if="${certRequest.cancellable}" class="mt-4 pt-3 border-top">
+                    <form th:action="@{/user/requests/{id}/cancel(id=${certRequest.id})}" method="post"
+                          onsubmit="return confirm('Are you sure you want to cancel this request?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                            <i class="bi bi-x-circle me-1"></i>Cancel Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${certRequest.hasCertificate}" class="mt-4 p-3 bg-success bg-opacity-10 rounded">
+            <i class="bi bi-patch-check-fill text-success me-2"></i>
+            <strong>Your certificate is ready!</strong>
+            <div class="mt-2">
+                <a th:href="@{/verify/{uuid}(uuid=${certRequest.certificateUuid})}"
+                   class="btn btn-success btn-sm">
+                    <i class="bi bi-eye me-1"></i>View Certificate
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

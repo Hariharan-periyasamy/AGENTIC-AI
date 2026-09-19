@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(title, content)" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title}">Admin - Digital Certificate System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <style>
+        .sidebar { background: #004d40; } /* Dark green for Admin */
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column" style="width:260px; min-width:260px;">
+        <div class="brand"><i class="bi bi-shield-lock-fill me-2"></i>Administration</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/admin/dashboard}"
+                   th:classappend="${requestUri.contains('/dashboard') ? 'active' : ''}">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/admin/requests}"
+                   th:classappend="${requestUri.contains('/requests') ? 'active' : ''}">
+                    <i class="bi bi-list-check me-2"></i>Manage Requests
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/admin/audit}"
+                   th:classappend="${requestUri.contains('/audit') ? 'active' : ''}">
+                    <i class="bi bi-shield-shaded me-2"></i>Audit Logs
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto p-3">
+            <div class="text-white-50 small mb-2" sec:authentication="name">admin@example.com</div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline-light btn-sm w-100">
+                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="flex-grow-1 main-content">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:replace="${content}">Content here</div>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+

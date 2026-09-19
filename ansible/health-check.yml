@@ -1,0 +1,18 @@
+﻿---
+- name: Verify Application Health
+  hosts: production
+  become: no
+
+  tasks:
+    - name: Wait for Spring Boot actuator to become available
+      ansible.builtin.uri:
+        url: http://localhost:8080/actuator/health
+        return_content: yes
+      register: health_response
+      until: health_response.status == 200 and 'UP' in health_response.content
+      retries: 12
+      delay: 5
+
+    - name: Display health check result
+      ansible.builtin.debug:
+        msg: "Application is HEALTHY. Response: {{ health_response.content }}"

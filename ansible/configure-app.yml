@@ -1,0 +1,35 @@
+﻿---
+- name: Prepare deployment environment and configure variables
+  hosts: production
+  become: yes
+  vars:
+    app_dir: "/opt/dcs_app"
+    db_name: "cert_system"
+    db_user: "cert_user"
+    db_password: "cert_password_secure"
+    db_root_password: "root_password_secure"
+
+  tasks:
+    - name: Ensure target application directory exists
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Ensure uploads directory exists for persistence
+      ansible.builtin.file:
+        path: "{{ app_dir }}/uploads/certificates"
+        state: directory
+        mode: '0777'
+
+    - name: Copy docker-compose.yml to deployment environment
+      ansible.builtin.copy:
+        src: "{{ repo_dir }}/docker-compose.yml"
+        dest: "{{ app_dir }}/docker-compose.yml"
+        mode: '0644'
+
+    - name: Create .env file for Docker Compose
+      ansible.builtin.template:
+        src: "templates/env.j2"
+        dest: "{{ app_dir }}/.env"
+        mode: '0600'

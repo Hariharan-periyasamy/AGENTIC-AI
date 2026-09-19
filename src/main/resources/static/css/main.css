@@ -1,0 +1,243 @@
+﻿/* =====================================================
+   Digital Certificate System - College Theme Stylesheet
+   ===================================================== */
+
+:root {
+    --college-primary: #003366; /* Navy Blue */
+    --college-secondary: #E3A82B; /* College Gold */
+    --college-accent: #00509E;
+    --bg-light: #F8F9FA;
+    --text-dark: #2C3E50;
+    --sidebar-bg: #002244;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text-dark);
+}
+
+/* Base utilities */
+.text-primary { color: var(--college-primary) !important; }
+.text-secondary { color: var(--college-secondary) !important; }
+.bg-primary { background-color: var(--college-primary) !important; }
+.bg-secondary { background-color: var(--college-secondary) !important; color: #000; }
+.btn-primary { 
+    background-color: var(--college-primary); 
+    border-color: var(--college-primary); 
+}
+.btn-primary:hover { 
+    background-color: var(--college-accent); 
+    border-color: var(--college-accent); 
+}
+.btn-outline-primary {
+    color: var(--college-primary);
+    border-color: var(--college-primary);
+}
+.btn-outline-primary:hover {
+    background-color: var(--college-primary);
+    color: #fff;
+}
+
+/* Sidebar layout */
+.sidebar {
+    min-height: 100vh;
+    background: var(--sidebar-bg);
+    color: #fff;
+    padding-top: 1rem;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.7);
+    padding: 0.85rem 1.25rem;
+    border-radius: 6px;
+    margin: 4px 12px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: rgba(255,255,255,0.1);
+    color: var(--college-secondary);
+}
+
+.sidebar .brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    padding: 1rem 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 1rem;
+    color: var(--college-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Main content */
+.main-content {
+    padding: 2.5rem;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s ease;
+}
+.card-header {
+    background-color: var(--college-primary);
+    color: #fff;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* Stat cards */
+.stat-card {
+    border-left: 4px solid var(--college-primary);
+    border-radius: 8px;
+}
+.stat-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.stat-card.pending  { border-color: #F39C12; }
+.stat-card.approved { border-color: #27AE60; }
+.stat-card.rejected { border-color: #E74C3C; }
+.stat-card.total    { border-color: var(--college-primary); }
+
+/* Status badges */
+.badge { font-weight: 600; padding: 0.4em 0.8em; }
+.badge-PENDING  { background-color: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
+.badge-UNDER_REVIEW { background-color: #DBEAFE; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.badge-APPROVED { background-color: #D1FAE5; color: #059669; border: 1px solid #A7F3D0; }
+.badge-REJECTED { background-color: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+.badge-CANCELLED { background-color: #F3F4F6; color: #4B5563; border: 1px solid #E5E7EB; }
+
+/* Tables */
+.table th {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #6B7280;
+    font-weight: 600;
+}
+.table td { vertical-align: middle; }
+
+/* Forms */
+.form-label { font-weight: 600; color: #374151; }
+.form-control:focus, .form-select:focus {
+    border-color: var(--college-secondary);
+    box-shadow: 0 0 0 0.25rem rgba(227, 168, 43, 0.25);
+}
+
+/* Navbar/Top */
+.navbar-brand { font-weight: 700; color: var(--college-primary) !important; }
+
+/* =====================================================
+   Animation Effects & UI Enhancements
+   ===================================================== */
+
+/* 1. Page Entry Animation */
+.main-content, .card, .container {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 2. Enhanced Card Hover Effects */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+.card-header {
+    background: linear-gradient(135deg, var(--college-primary) 0%, var(--college-accent) 100%);
+}
+
+/* 3. Button Pulse and Hover */
+.btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+.btn:hover::after {
+    width: 200px;
+    height: 200px;
+}
+.btn:active {
+    transform: scale(0.96);
+}
+
+/* 4. Table Row Animations */
+.table tbody tr {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.table tbody tr:hover {
+    background-color: rgba(227, 168, 43, 0.05);
+    transform: scale(1.01);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    z-index: 1;
+    position: relative;
+    border-radius: 6px;
+}
+
+/* 5. Sidebar Gradient Animation */
+.sidebar {
+    background: linear-gradient(180deg, var(--sidebar-bg) 0%, #001a33 100%);
+    position: relative;
+    overflow: hidden;
+}
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(227,168,43,0.05) 0%, transparent 60%);
+    animation: rotateGradient 15s linear infinite;
+}
+
+@keyframes rotateGradient {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 6. Form Input Focus Animations */
+.form-control, .form-select {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+.form-control:focus, .form-select:focus {
+    transform: scale(1.01);
+}
+
+/* 7. Animated Badges */
+.badge {
+    transition: all 0.3s ease;
+}
+.badge:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}

@@ -1,0 +1,43 @@
+﻿---
+- name: Build, Stop Old, Remove Old, Start New Container
+  hosts: production
+  become: yes
+  vars:
+    app_dir: "/opt/dcs_app"
+
+  tasks:
+    - name: Ensure community.docker collection is installed
+      ansible.builtin.command: ansible-galaxy collection install community.docker
+      changed_when: false
+
+    - name: Copy application source code for building
+      ansible.builtin.copy:
+        src: "{{ repo_dir }}/"
+        dest: "{{ app_dir }}/src_build/"
+        # Exclude directories we don't want to copy
+        exclude:
+          - "target"
+          - ".git"
+          - "ansible"
+
+    - name: Build the application Docker image
+      community.docker.docker_image:
+        name: dcs_app
+        tag: latest
+        build:
+          path: "{{ app_dir }}/src_build/"
+        source: build
+        force_source: yes
+
+    - name: Deploy application via Docker Compose
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        build: never
+        pull: always
+        recreate: auto
+      register: compose_output
+
+    - name: Display docker-compose status
+      ansible.builtin.debug:
+        var: compose_output

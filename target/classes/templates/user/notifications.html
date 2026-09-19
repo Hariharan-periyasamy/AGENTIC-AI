@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{user/layout :: layout('Notifications', ~{::content})}">
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Notifications
+            <span th:if="${unreadCount > 0}"
+                  class="badge bg-danger rounded-pill ms-1"
+                  th:text="${unreadCount}"></span>
+        </h4>
+        <form th:if="${!#lists.isEmpty(notifications)}"
+              th:action="@{/user/notifications/mark-all-read}" method="post">
+            <button class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-check2-all me-1"></i>Mark All Read
+            </button>
+        </form>
+    </div>
+
+    <div th:if="${#lists.isEmpty(notifications)}" class="alert alert-info">
+        <i class="bi bi-bell-slash me-2"></i>No notifications yet.
+    </div>
+
+    <div class="list-group" th:if="${!#lists.isEmpty(notifications)}">
+        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-start p-3"
+             th:each="n : ${notifications}"
+             th:classappend="${!n.read ? 'bg-light' : ''}">
+            <div>
+                <i class="bi bi-bell me-2" th:classappend="${!n.read ? 'text-primary' : 'text-muted'}"></i>
+                <span th:text="${n.message}"></span>
+            </div>
+            <div class="d-flex flex-column align-items-end gap-1">
+                <small class="text-muted" th:text="${#temporals.format(n.createdAt,'dd MMM HH:mm')}"></small>
+                <span th:if="${!n.read}" class="badge bg-primary rounded-pill">New</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

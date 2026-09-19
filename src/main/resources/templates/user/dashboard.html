@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{user/layout :: layout('Dashboard', ~{::content})}">
+<body>
+<div th:fragment="content">
+    <h4 class="mb-1">Welcome back, <span th:text="${dashboard.fullName}">User</span>!</h4>
+    <p class="text-muted mb-4">Here is a summary of your certificate activity.</p>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card total p-3">
+                <div class="text-muted small">Total Requests</div>
+                <div class="h3 fw-bold" th:text="${dashboard.totalRequests}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card pending p-3">
+                <div class="text-muted small">Pending</div>
+                <div class="h3 fw-bold" th:text="${dashboard.pendingRequests}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card approved p-3">
+                <div class="text-muted small">Approved</div>
+                <div class="h3 fw-bold" th:text="${dashboard.approvedRequests}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card rejected p-3">
+                <div class="text-muted small">Rejected</div>
+                <div class="h3 fw-bold" th:text="${dashboard.rejectedRequests}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications alert -->
+    <div th:if="${dashboard.unreadNotifications > 0}" class="alert alert-info">
+        <i class="bi bi-bell-fill me-2"></i>
+        You have <strong th:text="${dashboard.unreadNotifications}"></strong> unread notification(s).
+        <a th:href="@{/user/notifications}" class="alert-link ms-2">View</a>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-3">
+        <div class="col-md-4">
+            <a th:href="@{/user/requests}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3">
+                <i class="bi bi-file-earmark-plus fs-2 text-primary"></i>
+                <div>
+                    <div class="fw-semibold">My Requests</div>
+                    <div class="text-muted small">Track your certificate requests</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a th:href="@{/user/certificates}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3">
+                <i class="bi bi-award fs-2 text-success"></i>
+                <div>
+                    <div class="fw-semibold">My Certificates</div>
+                    <div class="text-muted small">Download approved certificates</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a th:href="@{/user/profile}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3">
+                <i class="bi bi-person-gear fs-2 text-secondary"></i>
+                <div>
+                    <div class="fw-semibold">My Profile</div>
+                    <div class="text-muted small">Update your personal information</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

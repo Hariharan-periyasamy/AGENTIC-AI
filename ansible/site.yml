@@ -1,0 +1,5 @@
+﻿---
+# Main orchestrator playbook
+- import_playbook: configure-app.yml
+- import_playbook: docker-deploy.yml
+- import_playbook: health-check.yml

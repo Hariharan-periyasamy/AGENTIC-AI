@@ -1,0 +1,17 @@
+com\certificate\system\admin\AdminServiceTest.class
+com\certificate\system\controller\SecurityIntegrationTest.class
+com\certificate\system\repository\DatabaseIntegrationTest.class
+com\certificate\system\security\UserServiceTest.class
+com\certificate\system\CertificateApplicationTests.class
+com\certificate\system\service\FileStorageServiceTest.class
+com\certificate\system\service\CertificateGenerationServiceTest.class
+com\certificate\system\admin\AdminControllerTest.class
+com\certificate\system\security\UserPortalServiceTest.class
+com\certificate\system\integration\CompleteWorkflowIntegrationTest.class
+com\certificate\system\controller\VerificationControllerTest.class
+com\certificate\system\controller\AdminAuditControllerTest.class
+com\certificate\system\controller\VerificationApiControllerTest.class
+com\certificate\system\controller\CertificateRequestWorkflowTest.class
+com\certificate\system\service\UserPortalServiceTest.class
+com\certificate\system\service\AuditLogServiceTest.class
+com\certificate\system\controller\UserPortalControllerTest.class
