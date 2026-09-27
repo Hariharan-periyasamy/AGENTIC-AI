@@ -5,6 +5,7 @@ pipeline {
         MVN_CMD = 'C:\\apache-maven-3.9.16\\bin\\mvn.cmd'
         IMAGE_NAME = 'digital-certificate-system'
         IMAGE_TAG = "${env.BUILD_NUMBER ?: 'latest'}"
+        COMPOSE_PROJECT_NAME = 'digital-certificate-system'
     }
 
     stages {
@@ -51,13 +52,13 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                bat 'docker compose build'
+                bat 'docker compose -p digital-certificate-system build'
             }
         }
 
         stage('Docker Deploy') {
             steps {
-                bat 'docker compose up -d'
+                bat 'docker compose -p digital-certificate-system up -d'
                 echo 'Docker containers deployed and running.'
             }
         }
@@ -76,7 +77,7 @@ pipeline {
                         echo "Waiting for application health... attempt ${i + 1}/24"
                     }
                     if (!healthy) {
-                        bat(script: 'docker compose logs --tail=50', returnStatus: true)
+                        bat(script: 'docker compose -p digital-certificate-system logs --tail=50', returnStatus: true)
                         error('Health check failed: application did not return status UP within 120 seconds')
                     }
                     echo 'Application health verified: status=UP'
@@ -123,7 +124,7 @@ pipeline {
         }
         failure {
             echo 'Pipeline FAILED. Collecting container logs...'
-            bat(script: 'docker compose logs --tail=50', returnStatus: true)
+            bat(script: 'docker compose -p digital-certificate-system logs --tail=50', returnStatus: true)
         }
         aborted {
             echo 'Pipeline ABORTED.'
