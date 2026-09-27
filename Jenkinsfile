@@ -57,9 +57,8 @@ pipeline {
 
         stage('Docker Deploy') {
             steps {
-                bat 'docker compose down || echo "No existing containers to stop"'
                 bat 'docker compose up -d'
-                echo 'Docker containers starting...'
+                echo 'Docker containers deployed and running.'
             }
         }
 
@@ -74,11 +73,11 @@ pipeline {
                             healthy = true
                             break
                         }
-                        echo "Waiting for application... attempt ${i + 1}/24"
+                        echo "Waiting for application health... attempt ${i + 1}/24"
                     }
                     if (!healthy) {
-                        bat 'docker logs dcs_app --tail 50'
-                        error('Health check failed after 120 seconds')
+                        bat(script: 'docker compose logs --tail=50', returnStatus: true)
+                        error('Health check failed: application did not return status UP within 120 seconds')
                     }
                     echo 'Application health verified: status=UP'
                 }
@@ -104,15 +103,15 @@ pipeline {
             steps {
                 script {
                     // Smoke test: Login page accessible
-                    bat 'powershell -Command "$r = Invoke-WebRequest -Uri \'http://localhost:8080/login\' -UseBasicParsing -TimeoutSec 10; if ($r.StatusCode -ne 200) { throw \'Login page not accessible\' }; Write-Host \'Login page: OK\'"'
+                    bat 'powershell -Command "$r = Invoke-WebRequest -Uri \'http://localhost:8080/login\' -UseBasicParsing -TimeoutSec 10; if ($r.StatusCode -ne 200) { throw \'Login page not accessible\' }; Write-Host \'Login page: OK (HTTP 200)\'"'
 
                     // Smoke test: Register page accessible
-                    bat 'powershell -Command "$r = Invoke-WebRequest -Uri \'http://localhost:8080/register\' -UseBasicParsing -TimeoutSec 10; if ($r.StatusCode -ne 200) { throw \'Register page not accessible\' }; Write-Host \'Register page: OK\'"'
+                    bat 'powershell -Command "$r = Invoke-WebRequest -Uri \'http://localhost:8080/register\' -UseBasicParsing -TimeoutSec 10; if ($r.StatusCode -ne 200) { throw \'Register page not accessible\' }; Write-Host \'Register page: OK (HTTP 200)\'"'
 
-                    // Smoke test: Actuator health
-                    bat 'powershell -Command "$r = Invoke-RestMethod -Uri \'http://localhost:8080/actuator/health\' -TimeoutSec 10; Write-Host \'Health: \' $r.status"'
+                    // Smoke test: Actuator health details
+                    bat 'powershell -Command "$r = Invoke-RestMethod -Uri \'http://localhost:8080/actuator/health\' -TimeoutSec 10; Write-Host \'Health Status:\' $r.status"'
 
-                    echo 'All smoke tests passed. Application is LIVE.'
+                    echo 'All smoke tests passed. Application is LIVE and healthy.'
                 }
             }
         }
@@ -123,9 +122,8 @@ pipeline {
             echo 'Pipeline executed successfully! Application is LIVE at http://localhost:8080'
         }
         failure {
-            echo 'Pipeline FAILED. Collecting logs...'
-            bat 'docker logs dcs_app --tail 100 2>&1 || echo "No app container logs"'
-            bat 'docker logs dcs_mysql --tail 50 2>&1 || echo "No mysql container logs"'
+            echo 'Pipeline FAILED. Collecting container logs...'
+            bat(script: 'docker compose logs --tail=50', returnStatus: true)
         }
         aborted {
             echo 'Pipeline ABORTED.'
