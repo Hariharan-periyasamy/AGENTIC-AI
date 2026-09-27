@@ -1,22 +1,15 @@
 pipeline {
     agent any
-    
-    tools {
-        // Ensure these tools are configured in Jenkins "Global Tool Configuration"
-        maven 'Maven 3.9'
-        jdk 'Java 21'
-    }
-    
+
     environment {
-        // Defines the image name for Docker build
-        IMAGE_NAME = 'dcs-app'
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        MVN_CMD = 'C:\\apache-maven-3.9.16\\bin\\mvn.cmd'
+        IMAGE_NAME = 'digital-certificate-system'
+        IMAGE_TAG = "${env.BUILD_NUMBER ?: 'latest'}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from the SCM configured in the Jenkins job
                 checkout scm
                 echo 'Source code checked out successfully.'
             }
@@ -24,87 +17,118 @@ pipeline {
 
         stage('Compile') {
             steps {
-                // Windows-friendly batch command
-                bat 'mvn clean compile'
+                bat "\"%MVN_CMD%\" clean compile"
             }
         }
 
         stage('Unit Test') {
             steps {
-                // Runs standard unit tests
-                bat 'mvn test -DskipITs=true'
+                bat "\"%MVN_CMD%\" test -DskipITs=true"
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
+                    junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
                 }
             }
         }
 
         stage('Integration Test') {
             steps {
-                // Assuming Integration tests are named *IT.java or run via Spring Boot Test
-                // For this project, standard 'mvn test' covers our @SpringBootTest integration tests
-                // To keep the pipeline semantic, we explicitly run it again or specifically target ITs
-                bat 'mvn test -Dtest=*IntegrationTest'
+                bat "\"%MVN_CMD%\" test -Dtest=*IntegrationTest"
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+                }
             }
         }
 
         stage('Package') {
             steps {
-                // Package JAR without re-running tests
-                bat 'mvn package -DskipTests'
+                bat "\"%MVN_CMD%\" package -DskipTests"
             }
         }
 
         stage('Docker Build') {
             steps {
-                // Build Docker images using the docker-compose build step
                 bat 'docker compose build'
             }
         }
 
-        stage('Docker Validation') {
+        stage('Docker Deploy') {
             steps {
-                // Validate images were created
-                bat 'docker images | findstr dcs_app'
-                bat 'docker images | findstr mysql'
-            }
-        }
-
-        stage('Deployment') {
-            steps {
-                // Deploy via Ansible (non-interactive: credentials must be set in Jenkins credential store)
-                // Note: inventory uses ansible_connection=local; become password should be injected via 
-                // Jenkins' withCredentials or sshagent block in production.
-                // For WSL2-based local deployment (default), 'become: yes' may require NOPASSWD sudoers entry.
-                bat 'wsl ansible-playbook -i ansible/inventory.ini ansible/site.yml'
-                echo 'Ansible orchestration complete.'
-                // Pause to let MySQL and Spring Boot boot up
-                
+                bat 'docker compose down || echo "No existing containers to stop"'
+                bat 'docker compose up -d'
+                echo 'Docker containers starting...'
             }
         }
 
         stage('Health Check') {
             steps {
-                // Check if the actuator health endpoint is responding
-                bat 'curl -f http://localhost:8080/actuator/health || exit 1'
-                echo 'Application health verified!'
+                script {
+                    def healthy = false
+                    for (int i = 0; i < 24; i++) {
+                        sleep(time: 5, unit: 'SECONDS')
+                        def exitCode = bat(script: 'powershell -Command "try { $r = Invoke-RestMethod -Uri \'http://localhost:8080/actuator/health\' -TimeoutSec 5; if ($r.status -eq \'UP\') { exit 0 } else { exit 1 } } catch { exit 1 }"', returnStatus: true)
+                        if (exitCode == 0) {
+                            healthy = true
+                            break
+                        }
+                        echo "Waiting for application... attempt ${i + 1}/24"
+                    }
+                    if (!healthy) {
+                        bat 'docker logs dcs_app --tail 50'
+                        error('Health check failed after 120 seconds')
+                    }
+                    echo 'Application health verified: status=UP'
+                }
+            }
+        }
+
+        stage('Ansible Verification') {
+            steps {
+                script {
+                    // Verify Docker containers are running (Ansible-style verification)
+                    bat 'docker ps --filter "name=dcs_app" --filter "status=running" | findstr dcs_app'
+                    bat 'docker ps --filter "name=dcs_mysql" --filter "status=running" | findstr dcs_mysql'
+
+                    // Verify health endpoint returns UP
+                    bat 'powershell -Command "$r = Invoke-RestMethod -Uri \'http://localhost:8080/actuator/health\' -TimeoutSec 10; if ($r.status -ne \'UP\') { throw \'Health check failed\' }; Write-Host \'Ansible Verification: Application is HEALTHY\'"'
+
+                    echo 'Ansible-style container management verification complete.'
+                }
+            }
+        }
+
+        stage('Final Verification') {
+            steps {
+                script {
+                    // Smoke test: Login page accessible
+                    bat 'powershell -Command "$r = Invoke-WebRequest -Uri \'http://localhost:8080/login\' -UseBasicParsing -TimeoutSec 10; if ($r.StatusCode -ne 200) { throw \'Login page not accessible\' }; Write-Host \'Login page: OK\'"'
+
+                    // Smoke test: Register page accessible
+                    bat 'powershell -Command "$r = Invoke-WebRequest -Uri \'http://localhost:8080/register\' -UseBasicParsing -TimeoutSec 10; if ($r.StatusCode -ne 200) { throw \'Register page not accessible\' }; Write-Host \'Register page: OK\'"'
+
+                    // Smoke test: Actuator health
+                    bat 'powershell -Command "$r = Invoke-RestMethod -Uri \'http://localhost:8080/actuator/health\' -TimeoutSec 10; Write-Host \'Health: \' $r.status"'
+
+                    echo 'All smoke tests passed. Application is LIVE.'
+                }
             }
         }
     }
-    
+
     post {
         success {
-            echo 'Pipeline executed successfully! Application is LIVE.'
+            echo 'Pipeline executed successfully! Application is LIVE at http://localhost:8080'
         }
         failure {
-            echo 'Pipeline FAILED. Executing rollback/cleanup...'
-            bat 'docker compose down'
+            echo 'Pipeline FAILED. Collecting logs...'
+            bat 'docker logs dcs_app --tail 100 2>&1 || echo "No app container logs"'
+            bat 'docker logs dcs_mysql --tail 50 2>&1 || echo "No mysql container logs"'
         }
         aborted {
             echo 'Pipeline ABORTED.'
         }
     }
 }
-

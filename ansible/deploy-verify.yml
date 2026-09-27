@@ -1,0 +1,99 @@
+---
+# Windows-compatible Ansible playbook for Docker-based deployment verification
+# Runs directly on Windows using localhost connection
+- name: Verify Digital Certificate System Deployment
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    app_url: "http://localhost:8080"
+    health_url: "http://localhost:8080/actuator/health"
+    app_container: "dcs_app"
+    db_container: "dcs_mysql"
+
+  tasks:
+    - name: Check if Docker is running
+      ansible.builtin.command: docker info
+      register: docker_info
+      changed_when: false
+      failed_when: docker_info.rc != 0
+
+    - name: Verify MySQL container is running
+      ansible.builtin.command: "docker ps --filter name={{ db_container }} --filter status=running --format {{'{{.Names}}'}}"
+      register: mysql_status
+      changed_when: false
+      failed_when: db_container not in mysql_status.stdout
+
+    - name: Display MySQL container status
+      ansible.builtin.debug:
+        msg: "MySQL container '{{ db_container }}' is RUNNING"
+
+    - name: Verify Application container is running
+      ansible.builtin.command: "docker ps --filter name={{ app_container }} --filter status=running --format {{'{{.Names}}'}}"
+      register: app_status
+      changed_when: false
+      failed_when: app_container not in app_status.stdout
+
+    - name: Display Application container status
+      ansible.builtin.debug:
+        msg: "Application container '{{ app_container }}' is RUNNING"
+
+    - name: Wait for application health endpoint
+      ansible.builtin.uri:
+        url: "{{ health_url }}"
+        return_content: yes
+        timeout: 10
+      register: health_response
+      until: health_response.status == 200 and 'UP' in health_response.content
+      retries: 12
+      delay: 5
+
+    - name: Display health check result
+      ansible.builtin.debug:
+        msg: "Application is HEALTHY. Response: {{ health_response.json }}"
+
+    - name: Smoke test - Login page
+      ansible.builtin.uri:
+        url: "{{ app_url }}/login"
+        return_content: yes
+        timeout: 10
+        status_code: 200
+      register: login_page
+
+    - name: Display login page result
+      ansible.builtin.debug:
+        msg: "Login page accessible: {{ login_page.status }}"
+
+    - name: Smoke test - Registration page
+      ansible.builtin.uri:
+        url: "{{ app_url }}/register"
+        return_content: yes
+        timeout: 10
+        status_code: 200
+      register: register_page
+
+    - name: Display registration page result
+      ansible.builtin.debug:
+        msg: "Registration page accessible: {{ register_page.status }}"
+
+    - name: Verify Docker container health details
+      ansible.builtin.command: "docker inspect --format {{'{{.State.Health.Status}}'}} {{ db_container }}"
+      register: db_health
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Final deployment summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          DEPLOYMENT VERIFICATION SUMMARY
+          ========================================
+          MySQL Container:    RUNNING
+          App Container:      RUNNING
+          Health Endpoint:    UP
+          Login Page:         ACCESSIBLE
+          Register Page:      ACCESSIBLE
+          ========================================
+          DEPLOYMENT STATUS: SUCCESS
+          ========================================
