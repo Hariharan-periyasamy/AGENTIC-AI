@@ -21,19 +21,19 @@
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/admin/dashboard}"
-                   th:classappend="${requestUri.contains('/dashboard') ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri.contains('/dashboard') ? 'active' : ''}">
                     <i class="bi bi-speedometer2 me-2"></i>Dashboard
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/admin/requests}"
-                   th:classappend="${requestUri.contains('/requests') ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri.contains('/requests') ? 'active' : ''}">
                     <i class="bi bi-list-check me-2"></i>Manage Requests
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/admin/audit}"
-                   th:classappend="${requestUri.contains('/audit') ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri.contains('/audit') ? 'active' : ''}">
                     <i class="bi bi-shield-shaded me-2"></i>Audit Logs
                 </a>
             </li>

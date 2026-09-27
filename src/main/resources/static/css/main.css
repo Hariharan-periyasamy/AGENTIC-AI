@@ -1,4 +1,4 @@
-﻿/* =====================================================
+/* =====================================================
    Digital Certificate System - College Theme Stylesheet
    ===================================================== */
 
@@ -46,6 +46,18 @@ body {
     color: #fff;
     padding-top: 1rem;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10;
+}
+
+.sidebar .nav,
+.sidebar ul,
+.sidebar .brand,
+.sidebar form,
+.sidebar div,
+.sidebar .nav-item {
+    position: relative;
+    z-index: 10;
 }
 
 .sidebar .nav-link {
@@ -55,6 +67,12 @@ body {
     margin: 4px 12px;
     transition: all 0.2s ease;
     font-weight: 500;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
 }
 
 .sidebar .nav-link:hover,
@@ -72,6 +90,8 @@ body {
     color: var(--college-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    position: relative;
+    z-index: 10;
 }
 
 /* Main content */
@@ -181,6 +201,7 @@ body {
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: width 0.4s ease, height 0.4s ease;
+    pointer-events: none;
 }
 .btn:hover::after {
     width: 200px;
@@ -218,6 +239,8 @@ body {
     height: 200%;
     background: radial-gradient(circle, rgba(227,168,43,0.05) 0%, transparent 60%);
     animation: rotateGradient 15s linear infinite;
+    pointer-events: none;
+    z-index: 1;
 }
 
 @keyframes rotateGradient {

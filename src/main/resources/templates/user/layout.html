@@ -20,31 +20,31 @@
         <ul class="nav flex-column mb-auto">
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/user/dashboard}"
-                   th:classappend="${requestUri == '/user/dashboard' ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri == '/user/dashboard' ? 'active' : ''}">
                     <i class="bi bi-grid-1x2-fill me-2"></i>Dashboard
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/user/requests}"
-                   th:classappend="${requestUri.startsWith('/user/requests') ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri.startsWith('/user/requests') ? 'active' : ''}">
                     <i class="bi bi-file-earmark-text-fill me-2"></i>My Requests
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/user/certificates}"
-                   th:classappend="${requestUri.startsWith('/user/certificates') ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri.startsWith('/user/certificates') ? 'active' : ''}">
                     <i class="bi bi-award-fill me-2"></i>Certificates
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/user/notifications}"
-                   th:classappend="${requestUri.startsWith('/user/notifications') ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri.startsWith('/user/notifications') ? 'active' : ''}">
                     <i class="bi bi-bell-fill me-2"></i>Notifications
                 </a>
             </li>
             <li class="nav-item mt-4">
                 <a class="nav-link text-white-50" th:href="@{/user/profile}"
-                   th:classappend="${requestUri == '/user/profile' ? 'active' : ''}">
+                   th:classappend="${requestUri != null and requestUri == '/user/profile' ? 'active' : ''}">
                     <i class="bi bi-person-circle me-2"></i>Profile Settings
                 </a>
             </li>
